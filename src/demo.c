@@ -22,7 +22,7 @@ static image buff [3];
 static image buff_letter[3];
 static int buff_index = 0;
 static void * cap;
-static float fps = 0 ,fps2 =0, fps3 = 0, fps4, fps5;
+static float fps = 0 ,fps2 =0, fps3 = 0, fps5;
 static float demo_thresh = 0;
 static float demo_hier = .5;
 static int running = 0;
