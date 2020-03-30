@@ -16,18 +16,11 @@ using namespace cv;
 image img;
 
 void  YoloDetecter::detect(cv::Mat frame, track_target* target, int n){
-	//imshow("frame",frame);
-	//waitKey(1);
-	printf("okk");
     img = mat_to_image(frame);
-
-	printf("okk");
-
-    yolomain(argcc, argvv, img);
-    //update_detection(frame, im, dets, nboxes, 0.5, names, alphabet, 80, target, n);
-    //free_detections(dets, nboxes);
+    yolomain(argc, argv, img);
+    update_detection(frame, im, dets, nboxes, 0.5, names, alphabet, 80, target, n);
+    free_detections(dets, nboxes);
     free_image(img);
-    printf("okk");
 }
 
 void YoloDetecter::update_detection(Mat frame, image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, track_target* tg, int n) {
@@ -61,8 +54,8 @@ void YoloDetecter::update_detection(Mat frame, image im, detection *dets, int nu
                 top = 0;
             if (bot > im.h - 1)
                 bot = im.h - 1;
-            Rect2d roi = Rect2d(left, top, right - left, bot - top);
 
+            Rect2d roi = Rect2d(left, top, right - left, bot - top);
             if (roi.width > 0 && roi.height > 0) {
                 bool flag = false;
                 for (int i = 0; i < n; i++) {

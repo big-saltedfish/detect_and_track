@@ -1,63 +1,38 @@
-
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/ocl.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <pthread.h>
 #include <sys/time.h>
-
 #include "kcftracker.hpp"
 #include "image.h"
 #include "thread_pool.hpp"
 #include "framework.h"
 #include "yolodetecter.h"
 
-
-
 using namespace std;
 using namespace cv;
 
-
-const int N_FRAME_A_DETECT = 20;     // 每mod帧，进行一帧检测
-const int TIME = 20;   // 若跟踪目标连续TIME帧未被检测，则认为跟踪目标已丢失，放弃跟踪
-const int THREAD_NUM = 8;  // 线程池线程队列数量
-const int MAXTARGET = 8;
+const int N_FRAME_A_DETECT = 20;    //every N_FRAME_A_DETECT frame,a frame wile be detected
+const int TIME = 20;   //if TIME frame the traget is not be detected,tracker give up it
+const int THREAD_NUM = 8;  //the number of threads in hread pool
+const int MAXTARGET = 8;  //max number of targets
 VideoCapture cap;
 
 Mat frame[3];
 
 int M;
-
 double toc, tic;
 int buff_index;
 
 track_target tg[MAXTARGET];
-
-int argcc;
-char** argvv;
-bool HOG = true;
-bool FIXEDWINDOW = false;
-bool MULTISCALE = true;
-bool SILENT = true;
-bool LAB = false;
-
-
-
-
-
-
-
-
-ThreadPool pool(1);
-
-
+ThreadPool pool(8);
+YoloDetecter yolo;
 
 
 float overlap_rate(Rect2d a, Rect2d b) {
     return (a & b).area() / (a.area() + b.area() - (a & b).area());
 }
-
-
 
 void draw_detection(Mat im) {
     for (int i = 0; i < MAXTARGET; i++)
@@ -69,8 +44,6 @@ void draw_detection(Mat im) {
         }
 }
 
-YoloDetecter yolo;
-
 int detect_in_thread(void *ptr) {
     yolo.detect(frame[buff_index], tg, MAXTARGET);
     draw_detection(frame[buff_index]);
@@ -79,7 +52,6 @@ int detect_in_thread(void *ptr) {
     printf("detect:%.2f\n", 1 / toc);
     return 0;
 }
-
 
 int track_son_thread(int id) {
     tg[id].result = tg[id].tracker.update(frame[buff_index]);
@@ -103,7 +75,6 @@ int track_in_thread(void *ptr) {
 }
 
 int show_in_thread(void *ptr) {
-    cout << "????";
     imshow("predictions", frame[(buff_index+2)%3]);
     waitKey(1);
     toc = what_time_is_it_now() - tic;
@@ -111,25 +82,16 @@ int show_in_thread(void *ptr) {
     return 0;
 }
 
-
 int main(int argc, char **argv) {
-    argc = 4;
-    argv[0] = "./darknet";
-    argv[1] = "detect";
-    argv[2] = "cfg/yolov3-tiny.cfg";
-    argv[3] = "yolov3-tiny.weights";
-    argcc = argc;
-    argvv = argv;
     cap.open("b.MOV");
+    //cap.set(CV_CAP_PROP_FRAME_WIDTH, 360);  //宽度
+    //cap.set(CV_CAP_PROP_FRAME_HEIGHT, 640); //高度
     make_window("predictions", 512, 512, 0);
     cap.set(CV_CAP_PROP_FRAME_WIDTH, 360);  //宽度
-    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 640); //高度
-
-
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 640); //炦度
     cap >> frame[0];
     cap >> frame[1];
-
-    KCFTracker trackertemp(HOG, FIXEDWINDOW, MULTISCALE, LAB);
+    KCFTracker trackertemp;
     for (int i = 0; i < MAXTARGET; i++) {
         tg[i].ok = false;
         tg[i].tracker = trackertemp;
@@ -168,13 +130,10 @@ int main(int argc, char **argv) {
         M++;
         if (M == N_FRAME_A_DETECT)
             M = 0;
-
         toc = what_time_is_it_now() - tic;
         printf("all:%.2f\n\n\n", 1 / toc);
         all_time += 1 / toc;
         sum_of_frame++;
-        if (sum_of_frame == 400)
-            break;
     }
     printf("avl time: %.3f", all_time / sum_of_frame);
 }

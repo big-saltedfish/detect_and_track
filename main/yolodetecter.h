@@ -10,16 +10,19 @@ extern "C" cv::Mat image_to_mat(image im);
 class YoloDetecter : public Detecter
 {
 	int argc;
-	char **argv;
 	char st[4][30];
+    char* argv[4];
 public:
     YoloDetecter()  {
     	argc = 4;
-    	strcpy(&st[0][0], "./darknet");
-        strcpy(&st[1][0], "detect");
-    	strcpy(&st[2][0], "cfg/yolov3-tiny.cfg");
-    	strcpy(&st[3][0], "yolov3-tiny.weights");
-    	argv = (char**)&st[0][0];
+        strcpy(st[0], "./darknet");
+        strcpy(st[1], "detect");
+        strcpy(st[2], "cfg/yolov3-tiny.cfg");
+        strcpy(st[3], "yolov3-tiny.weights");
+        argv[0] = st[0];
+        argv[1] = st[1];
+        argv[2] = st[2];
+        argv[3] = st[3];
     }
     virtual void  detect(cv::Mat, track_target*, int);
 private:
