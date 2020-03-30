@@ -27,6 +27,7 @@ IplImage *image_to_ipl(image im)
 
 image ipl_to_image(IplImage* src)
 {
+    printf("2:");
     int h = src->height;
     int w = src->width;
     int c = src->nChannels;
@@ -34,6 +35,7 @@ image ipl_to_image(IplImage* src)
     unsigned char *data = (unsigned char *)src->imageData;
     int step = src->widthStep;
     int i, j, k;
+    printf("2:");
 
     for(i = 0; i < h; ++i){
         for(k= 0; k < c; ++k){
@@ -42,6 +44,7 @@ image ipl_to_image(IplImage* src)
             }
         }
     }
+    printf("2:");
     return im;
 }
 
@@ -60,9 +63,15 @@ Mat image_to_mat(image im)
 
 image mat_to_image(Mat m)
 {
+    printf("1::");
     IplImage ipl = m;
+    printf("1::");
     image im = ipl_to_image(&ipl);
+    printf("1::");
+
     rgbgr_image(im);
+    printf("1::");
+
     return im;
 }
 
