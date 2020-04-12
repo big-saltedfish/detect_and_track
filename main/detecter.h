@@ -11,7 +11,6 @@ public:
     Detecter() {};
     virtual  ~Detecter() {};
     virtual void  detect(cv::Mat, track_target*, int)=0;
-
 };
 
 #endif

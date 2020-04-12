@@ -12,6 +12,7 @@ struct track_target {
     cv::Rect result;
     char labelstr[4096];
     int time;
+    static int TIME;
 };
 
 

@@ -9,7 +9,6 @@ extern char **names;
 extern image **alphabet;
 extern detection *dets;
 extern "C" image mat_to_image(cv::Mat);
-extern const int TIME = 20;
 extern int argcc;
 extern char** argvv;
 using namespace cv;
@@ -61,7 +60,7 @@ void YoloDetecter::update_detection(Mat frame, image im, detection *dets, int nu
                 for (int i = 0; i < n; i++) {
                     if (tg[i].ok && overlap_rate(roi, tg[i].result) > 0.3) {
                         tg[i].tracker.init(roi, frame);
-                        tg[i].time = TIME;
+                        tg[i].time = tg[i].TIME;
                         flag = true;
                         break;
                     }
@@ -73,7 +72,7 @@ void YoloDetecter::update_detection(Mat frame, image im, detection *dets, int nu
                             tg[i].tracker.init(roi, frame);
                             tg[i].result = roi;
                             strcpy(tg[i].labelstr, labelstr);
-                            tg[i].time = TIME;
+                            tg[i].time = tg[i].TIME;
                             break;
                         }
                 }
